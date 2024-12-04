@@ -29,15 +29,20 @@ public class RentalController {
 
     @GetMapping("/api/admin/request/rental")
     public ReservationDto.ReservationResponse getRentalRequests() {
-        List<Reservation> reservations = reservationRepository.findAll();  // 모든 대여 요청 조회
+        // Lazy 로딩 문제 해결: 즉시 로딩(JOIN FETCH) 사용
+        List<Reservation> reservations = reservationRepository.findAllWithDetails();
 
+        // Reservation -> DTO 변환
         List<ReservationDto.ReservationRequest> reservationRequests = reservations.stream()
                 .map(reservation -> ReservationDto.ReservationRequest.builder()
                         .reservationId(reservation.getReservationId())
                         .requestDate(reservation.getRequestDate().toString())
                         .userId(reservation.getUser().getUserId())
                         .name(reservation.getUser().getName())
+                        .studentNumber(reservation.getUser().getStudentNumber()) // 학번
+                        .phoneNumber(reservation.getUser().getPhoneNumber())    // 연락처
                         .notebookId(reservation.getNotebook().getNotebookId())
+                        .notebookModel(reservation.getNotebook().getModel())   // 노트북 모델명
                         .build())
                 .collect(Collectors.toList());
 

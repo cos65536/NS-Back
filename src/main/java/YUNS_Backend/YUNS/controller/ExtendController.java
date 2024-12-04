@@ -26,10 +26,11 @@ public class ExtendController {
 
     @GetMapping("/extend")
     public ResponseEntity<ReservationDto.ReservationResponse> getExtendRequests() {
-        List<Reservation> reservations = reservationRepository.findAll();
+        // Lazy 로딩 문제 해결: 즉시 로딩(JOIN FETCH) 쿼리 사용
+        List<Reservation> reservations = reservationRepository.findAllByType(Type.EXTEND);
 
+        // Reservation -> DTO 변환
         List<ReservationDto.ReservationRequest> extendRequests = reservations.stream()
-                .filter(reservation -> reservation.getType() == Type.EXTEND)
                 .map(reservation -> ReservationDto.ReservationRequest.builder()
                         .reservationId(reservation.getReservationId())
                         .requestDate(reservation.getRequestDate().toString())
@@ -45,7 +46,6 @@ public class ExtendController {
 
         return ResponseEntity.ok(response);
     }
-
 
     @PostMapping("/approve/{reservationId}")
     public ResponseEntity<Object> approveExtendRequest(@PathVariable Long reservationId, @RequestBody RentalDto.RentalApprovalRequest request) {

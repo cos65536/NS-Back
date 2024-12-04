@@ -17,6 +17,9 @@ public class ReservationDto {
         private Long userId;
         private String name;
         private Long notebookId;
+        private String studentNumber;
+        private String phoneNumber;
+        private String notebookModel;
     }
 
     @Getter
